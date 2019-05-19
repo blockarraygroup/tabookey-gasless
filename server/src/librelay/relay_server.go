@@ -503,12 +503,17 @@ func (relay *relayServer) CreateRelayTransaction(request RelayTransactionRequest
 		From: request.From,
 		Data: input,
 	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	maxCharge := request.GasPrice.Uint64() * gasEstimate * (100 + relay.GasPricePercent.Uint64()) / 100
 	if toBalance.Uint64() < maxCharge {
 		err = fmt.Errorf("Recipient balance too low: %d, gasEstimate*fee: %d", toBalance, maxCharge)
 		log.Println(err)
 		return
 	}
+	log.Println("Estimated max charge of relyed tx:",maxCharge)
 
 	nonceMutex.Lock()
 	defer nonceMutex.Unlock()
